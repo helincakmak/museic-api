@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser, Group, Permission, BaseUserManager
 from django.forms import ValidationError
 from .managers import CustomUserManager  
+from django.conf import settings
 
 
 class Artist(models.Model):
@@ -36,15 +37,17 @@ class Song(models.Model):
     def clean(self):
         if self.file and not self.file.name.endswith(('.mp3', '.wav')):
             raise ValidationError("Only .mp3 or .wav files are allowed.")
-
+        
 class Playlist(models.Model):
-    name = models.CharField(max_length=100, help_text="Name of the playlist")
-    description = models.TextField(help_text="Description of the playlist", blank=True, null=True)
-    songs = models.ManyToManyField(Song, related_name="playlists", help_text="Songs included in the playlist")
+    name = models.CharField(max_length=255, help_text="Name of the playlist")
+    description = models.TextField(blank=True, null=True, help_text="Optional description of the playlist")
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, help_text="Owner of the playlist")
+    songs = models.ManyToManyField(Song, related_name='playlists', blank=True, help_text="Songs included in the playlist")
     created_at = models.DateTimeField(auto_now_add=True, help_text="Date and time when the playlist was created")
 
     def __str__(self):
-        return self.name
+        return f"{self.name} by {self.user.username}"
+
 
 
 class CustomUserManager(BaseUserManager):

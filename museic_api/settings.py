@@ -12,8 +12,11 @@ DEBUG = True
 
 AUTH_USER_MODEL = 'museic.CustomUser'
 
+APPEND_SLASH = False
 
-ALLOWED_HOSTS = ['192.168.1.37', 'localhost', '127.0.0.1', '10.0.2.2', '192.168.1.174']
+
+
+ALLOWED_HOSTS = ['192.168.1.37', 'localhost', '127.0.0.1', '10.0.2.2', '192.168.1.174', '192.168.147.126']
 
 # Application definition
 INSTALLED_APPS = [

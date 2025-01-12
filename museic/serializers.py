@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Song, Album, Artist, CustomUser
+from .models import Song, Album, Artist, CustomUser, Playlist
 
 class ArtistSerializer(serializers.ModelSerializer):
     class Meta:
@@ -42,3 +42,11 @@ class UserSerializer(serializers.ModelSerializer):
             username=validated_data.get('username')
         )
         return user
+
+class PlaylistSerializer(serializers.ModelSerializer):
+    user = UserSerializer(read_only=True)  # Kullanıcıyı yalnızca okuma modunda döndür
+    songs = SongSerializer(many=True, read_only=True)  # Playlist'teki şarkıları yalnızca okuma modunda döndür
+
+    class Meta:
+        model = Playlist
+        fields = ['id', 'name', 'description', 'user', 'songs', 'created_at']

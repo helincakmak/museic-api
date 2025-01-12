@@ -8,6 +8,15 @@ from django.contrib.auth import authenticate
 from rest_framework.exceptions import AuthenticationFailed
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.decorators import api_view
+from rest_framework.decorators import action
+from .models import Playlist
+from .serializers import PlaylistSerializer
+from rest_framework.permissions import IsAuthenticated
+from rest_framework import viewsets
+from django.shortcuts import get_object_or_404
+from rest_framework.exceptions import NotAuthenticated
+
+
 
 
 
@@ -103,3 +112,14 @@ class SongDetail(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = SongSerializer
     permission_classes = [AllowAny]  
 
+
+# Playlist API
+class PlaylistViewSet(viewsets.ModelViewSet):
+    queryset = Playlist.objects.all()
+    serializer_class = PlaylistSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def perform_create(self, serializer):
+        if not self.request.user.is_authenticated:
+            raise NotAuthenticated("User must be logged in to create a playlist.")
+        serializer.save(user=self.request.user)
