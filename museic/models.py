@@ -1,5 +1,6 @@
 from django.db import models
-from django.contrib.auth.models import AbstractUser, Group, Permission
+from django.contrib.auth.models import AbstractUser, Group, Permission, BaseUserManager
+from django.forms import ValidationError
 from .managers import CustomUserManager  
 
 
@@ -46,7 +47,30 @@ class Playlist(models.Model):
         return self.name
 
 
+class CustomUserManager(BaseUserManager):
+    def create_user(self, username, email, password=None, **extra_fields):
+        """
+        Kullanıcı oluştururken kullanılacak yardımcı fonksiyon.
+        """
+        if not email:
+            raise ValueError('Email gerekli.')
+        email = self.normalize_email(email)
+        user = self.model(username=username, email=email, **extra_fields)
+        user.set_password(password)
+        user.save(using=self._db)
+        return user
+
+    def create_superuser(self, username, email, password=None, **extra_fields):
+        """
+        Süper kullanıcı oluştururken kullanılacak fonksiyon.
+        """
+        extra_fields.setdefault('is_staff', True)
+        extra_fields.setdefault('is_superuser', True)
+
+        return self.create_user(username, email, password, **extra_fields)
+
 class CustomUser(AbstractUser):
+    # Kullanıcıya özel alanlar
     username = models.CharField(max_length=100, unique=True)
     email = models.EmailField(unique=True)
     gender = models.CharField(max_length=10, default="Female")
@@ -54,11 +78,11 @@ class CustomUser(AbstractUser):
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
 
+    # İstenilen diğer alanlar
     USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = ['email', 'gender']
 
-    objects = CustomUserManager()
-
+    # Many-to-many ilişkiler
     groups = models.ManyToManyField(
         'auth.Group',
         related_name='customuser_set',  # Çakışmayı önlemek için 'related_name' ekleyin
@@ -73,5 +97,8 @@ class CustomUser(AbstractUser):
         help_text="Specific permissions for this user."
     )
 
+    # Kullanıcıyı str olarak göster
     def __str__(self):
         return self.username
+
+

@@ -11,6 +11,6 @@ urlpatterns = [
     path('songs/', SongListCreate.as_view(), name='song-list-create'),
     path('songs/<int:pk>/', SongDetail.as_view(), name='song-detail'),
     path('register/', UserRegistrationView.as_view(), name='user-register'),
-     path('login/', UserLoginView.as_view(), name='user-login'),
+    path('login/', UserLoginView.as_view(), name='user-login'),
    
 ]

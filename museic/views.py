@@ -4,7 +4,6 @@ from rest_framework.response import Response
 from .models import Song, Album, Artist, CustomUser
 from .serializers import SongSerializer, AlbumSerializer, ArtistSerializer, UserSerializer
 from rest_framework.permissions import AllowAny
-from rest_framework.authtoken.models import Token
 from django.contrib.auth import authenticate
 from rest_framework.exceptions import AuthenticationFailed
 from django.views.decorators.csrf import csrf_exempt
@@ -40,7 +39,7 @@ class UserLoginView(APIView):
 
         if not username or not password:
             return Response(
-                {'error': 'Username ve şifre gereklidir.'}, 
+                {'error': 'Kullanıcı adı ve şifre gereklidir.'},
                 status=status.HTTP_400_BAD_REQUEST
             )
 
@@ -48,25 +47,25 @@ class UserLoginView(APIView):
 
         if user is not None:
             if user.is_active:
-                # Kullanıcı giriş yaptıktan sonra bir cevap döndür
                 return Response(
                     {
                         'message': 'Giriş başarılı!',
                         'username': user.username,
                         'email': user.email
-                    }, 
+                    },
                     status=status.HTTP_200_OK
                 )
             else:
                 return Response(
-                    {'error': 'Bu kullanıcı aktif değil.'}, 
+                    {'error': 'Bu kullanıcı aktif değil.'},
                     status=status.HTTP_403_FORBIDDEN
                 )
         else:
             return Response(
-                {'error': 'Geçersiz kullanıcı adı veya şifre.'}, 
+                {'error': 'Geçersiz kullanıcı adı veya şifre.'},
                 status=status.HTTP_401_UNAUTHORIZED
             )
+
 
 # Artist API Views
 class ArtistListCreate(generics.ListCreateAPIView):

@@ -13,7 +13,7 @@ DEBUG = True
 AUTH_USER_MODEL = 'museic.CustomUser'
 
 
-ALLOWED_HOSTS = ['192.168.1.37', 'localhost', '127.0.0.1', '10.0.2.2']
+ALLOWED_HOSTS = ['192.168.1.37', 'localhost', '127.0.0.1', '10.0.2.2', '192.168.1.174']
 
 # Application definition
 INSTALLED_APPS = [
@@ -24,7 +24,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',  # REST Framework
-    'rest_framework.authtoken',
     'museic',  # Museic uygulaması
     'corsheaders',  # CORS headers
     'django_extensions',
@@ -108,6 +107,11 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # CORS settings
 CORS_ALLOW_ALL_ORIGINS = True  # Allow all origins
+
+CORS_ALLOWED_ORIGINS = [
+    'http://192.168.1.37:3000',  # Flutter uygulaması portu (gerekliyse)
+    'http://192.168.1.174:8000',  # API portu
+]
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

@@ -15,7 +15,7 @@ class AlbumSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class SongSerializer(serializers.ModelSerializer):
+class SongSerializer(serializers.ModelSerializer):  
     album = AlbumSerializer()  # İlgili album'in tüm verilerini döndür
     artist = ArtistSerializer()  # İlgili artist'in tüm verilerini döndür
     cover_image = serializers.ImageField(max_length=None, use_url=True, allow_null=True, required=False)
