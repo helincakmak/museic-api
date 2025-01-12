@@ -112,14 +112,28 @@ class SongDetail(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = SongSerializer
     permission_classes = [AllowAny]  
 
-
 # Playlist API
 class PlaylistViewSet(viewsets.ModelViewSet):
     queryset = Playlist.objects.all()
     serializer_class = PlaylistSerializer
-    permission_classes = [permissions.IsAuthenticated]
 
-    def perform_create(self, serializer):
-        if not self.request.user.is_authenticated:
-            raise NotAuthenticated("User must be logged in to create a playlist.")
-        serializer.save(user=self.request.user)
+    @action(detail=True, methods=['post'])
+    def add_songs(self, request, pk=None):
+        playlist = self.get_object()
+
+        # 'song_ids' parametresinin olup olmadığını kontrol et
+        song_ids = request.data.get('song_ids', [])
+
+        # Eğer song_ids boşsa, hata mesajı dön
+        if not song_ids:
+            return Response({'error': 'En az bir şarkı eklemelisiniz.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Şarkı ekleme işlemi
+        for song_id in song_ids:
+            try:
+                song = Song.objects.get(id=song_id)
+                playlist.songs.add(song)
+            except Song.DoesNotExist:
+                return Response({'detail': f'Song with ID {song_id} not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+        return Response({'detail': 'Songs added successfully.'}, status=status.HTTP_200_OK)

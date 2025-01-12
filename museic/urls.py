@@ -23,7 +23,9 @@ urlpatterns = [
     path('register/', UserRegistrationView.as_view(), name='user-register'),
     path('login/', UserLoginView.as_view(), name='user-login'),
 
+    # Playlist şarkı ekleme endpoint'i
+    path('playlists/<int:pk>/add_songs/', PlaylistViewSet.as_view({'post': 'add_songs'}), name='add-songs-to-playlist'),
+
     # Router'ı dahil et
     path('', include(router.urls)),
-
 ]

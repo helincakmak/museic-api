@@ -45,8 +45,19 @@ class UserSerializer(serializers.ModelSerializer):
 
 class PlaylistSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)  # Kullanıcıyı yalnızca okuma modunda döndür
-    songs = SongSerializer(many=True, read_only=True)  # Playlist'teki şarkıları yalnızca okuma modunda döndür
+    songs = SongSerializer(many=True, required=False)  # Playlist'teki şarkıları opsiyonel olarak ekleyebiliriz
 
     class Meta:
         model = Playlist
         fields = ['id', 'name', 'description', 'user', 'songs', 'created_at']
+
+    def create(self, validated_data):
+        songs_data = validated_data.pop('songs', [])
+        playlist = Playlist.objects.create(**validated_data)
+
+        # Şarkıları playlist'e eklemek
+        for song_data in songs_data:
+            song = Song.objects.get(id=song_data['id'])
+            playlist.songs.add(song)
+
+        return playlist
