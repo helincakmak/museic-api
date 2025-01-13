@@ -116,6 +116,7 @@ class SongDetail(generics.RetrieveUpdateDestroyAPIView):
 class PlaylistViewSet(viewsets.ModelViewSet):
     queryset = Playlist.objects.all()
     serializer_class = PlaylistSerializer
+    permission_classes = [IsAuthenticated]
 
     @action(detail=True, methods=['post'])
     def add_songs(self, request, pk=None):

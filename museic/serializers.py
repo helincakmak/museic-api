@@ -52,12 +52,22 @@ class PlaylistSerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'description', 'user', 'songs', 'created_at']
 
     def create(self, validated_data):
+        # Şarkıları al
         songs_data = validated_data.pop('songs', [])
-        playlist = Playlist.objects.create(**validated_data)
+        
+        # Kullanıcıyı otomatik olarak al (request'ten)
+        user = self.context['request'].user
+        
+        # Playlist oluştur
+        playlist = Playlist.objects.create(user=user, **validated_data)
 
         # Şarkıları playlist'e eklemek
         for song_data in songs_data:
-            song = Song.objects.get(id=song_data['id'])
-            playlist.songs.add(song)
+            # Song'un var olup olmadığını kontrol et
+            try:
+                song = Song.objects.get(id=song_data['id'])
+                playlist.songs.add(song)
+            except Song.DoesNotExist:
+                raise serializers.ValidationError(f"Song with id {song_data['id']} does not exist.")
 
         return playlist
